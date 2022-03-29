@@ -7,7 +7,7 @@ import { useState } from 'react';
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux';
 import { uiClosedModal } from '../../actions/ui';
-import { eventAddNew, eventClearActiveEvent } from '../../actions/event';
+import { eventAddNew, eventClearActiveEvent, eventUpdated } from '../../actions/event';
 
 const customStyles = {
   content: {
@@ -48,6 +48,7 @@ const CalendarModal = () => {
   useEffect(() => {
     
     if(activeEvent) setFormValues(activeEvent)
+    else setFormValues(initialEvent)
   }, [activeEvent, setFormValues])
   
 
@@ -70,21 +71,28 @@ const CalendarModal = () => {
     if( title.trim().length < 2 ){
       return setTitileValid(false)
     }
-    dispatch(eventAddNew({
-      ...formValues,
-      id: new Date().getTime(),
-      user:{
-        _id: '123',
-        name: 'Adrian'
-      }
-    }))
+
+    if( activeEvent ) {
+      dispatch(eventUpdated(formValues))
+    } else {
+      dispatch(eventAddNew({
+        ...formValues,
+        id: new Date().getTime(),
+        user:{
+          _id: '123',
+          name: 'Adrian'
+        }
+      }))
+    }
+
+
     setTitileValid(true)
     closeModal()
   }
-
   const closeModal = () =>{
     dispatch(uiClosedModal())
     dispatch(eventClearActiveEvent())
+
     setFormValues(initialEvent)
   }
 
@@ -113,7 +121,7 @@ const CalendarModal = () => {
     className="modal"
     overlayClassName="modal-fondo"
   >
-    <h1> Nuevo evento </h1>
+    <h1> {activeEvent ? 'Modificar Evento' : 'Nuevo Evento'} </h1>
 <hr />
 <form className="container" onSubmit={handleSubmitChange}>
 

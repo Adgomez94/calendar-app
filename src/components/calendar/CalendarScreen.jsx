@@ -13,12 +13,14 @@ import { messages } from '../../helpers/calendar-messages-es'
 import CalendarModal from './CalendarModal'
 import { useDispatch, useSelector } from 'react-redux'
 import { uiOpenModal } from '../../actions/ui'
-import { eventSetActive } from '../../actions/event'
+import { eventClearActiveEvent, eventSetActive } from '../../actions/event'
 import AddNewFab from '../ui/AddNewFab'
+import DeleteEventFab from '../ui/DeleteEventFab'
 
 moment.locale('es')
 
 // const myEventsList = [{
+//   id: new Date().getTime(),
 //   title: 'Cumpleaños del jefe',
 //   start: moment().toDate(),
 //   end: moment().add(2, 'hours').toDate(),
@@ -38,7 +40,7 @@ const CalendarScreen = () => {
 
   const dispatch = useDispatch()
 
-  const { events } = useSelector(state =>state.calendar)
+  const { events, activeEvent } = useSelector(state =>state.calendar)
 
   const onDoubleClick = (e) =>{
     dispatch(uiOpenModal())
@@ -61,6 +63,10 @@ const CalendarScreen = () => {
       opacity: 0.8,
       color: '#fff'
     }
+  }
+
+  const onSelectSlot = () =>{
+    dispatch(eventClearActiveEvent())
   }
 
   return (
@@ -86,10 +92,16 @@ const CalendarScreen = () => {
         onView={onViewEvent}
         /* la vista */
         view={lastView}
+        /* Un evento cuando le das clic afuera nos da la informacion donde le demos clic*/
+        onSelectSlot={onSelectSlot}
+        selectable={true}
       />
 
       <AddNewFab />
       <CalendarModal />
+      {
+        activeEvent && <DeleteEventFab /> 
+      }   
     </div>
   )
 }
