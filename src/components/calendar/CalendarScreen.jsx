@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 
@@ -13,7 +13,7 @@ import { messages } from '../../helpers/calendar-messages-es'
 import CalendarModal from './CalendarModal'
 import { useDispatch, useSelector } from 'react-redux'
 import { uiOpenModal } from '../../actions/ui'
-import { eventClearActiveEvent, eventSetActive } from '../../actions/event'
+import { eventClearActiveEvent, eventSetActive, eventStartLoading } from '../../actions/event'
 import AddNewFab from '../ui/AddNewFab'
 import DeleteEventFab from '../ui/DeleteEventFab'
 
@@ -36,11 +36,17 @@ const localizer = momentLocalizer(moment);
 
 const CalendarScreen = () => {
 
-  const [lastView, setLastView] = useState(localStorage.getItem('lastView') || 'month')
-
+  
   const dispatch = useDispatch()
-
+  
   const { events, activeEvent } = useSelector(state =>state.calendar)
+  const { uid } = useSelector(state =>state.auth)
+  
+  const [lastView, setLastView] = useState(localStorage.getItem('lastView') || 'month')
+  useEffect(() => {
+    dispatch(eventStartLoading())
+  }, [dispatch])
+  
 
   const onDoubleClick = (e) =>{
     dispatch(uiOpenModal())
@@ -58,7 +64,7 @@ const CalendarScreen = () => {
   const eventStyleGetter = (event, date ) =>{
     // damos estilos a lña tarjeta de evento
     return {
-      backgroundColor: "#000",
+      backgroundColor: (uid === event.user.id) ? "#000" : "#465660",
       borRadius: '0px',
       opacity: 0.8,
       color: '#fff'
